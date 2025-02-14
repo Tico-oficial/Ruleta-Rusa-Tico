@@ -1,0 +1,63 @@
+PREFIJO: +rr (o el que queras)
+
+$nomention
+$jsonParse[$getUserVar[ruleta-rusa;$authorID;$guildID]]
+$if[$json[juego]!=]
+❌ | Ya estas en un juego $json[juego]
+$deletecommand
+$deleteIn[3s]
+$stop
+$endif
+$jsonSetString[tiempo;$sum[$getTimestamp;300]]
+$jsonSetString[id1;$authorID]
+$jsonSetString[nu;$sum[$json[nu];1]]
+$var[j;$json[nu]]
+$var[t;$json[tiempo]]
+$setUserVar[ruleta-rusa;$jsonStringify;$authorID;$guildID]
+
+$var[id;$sendEmbedMessage[$channelID;;
+🔫 | Ruleta rusa;;
+Se cancela: <t:$var[t]:R>
+
+Has inciado un nuevo juego de la ruleta rusa.
+
+El juego empezará solo si hay 2 o más jugadores.
+
+Si en 5 minutos el juego no ha inciado se cancelará automáticamente
+
+Pueden entrar hasta 10 jugadores
+
+__**Jugadores:**__
+
+``$var[j]`` - <@$authorID>;6e00ff;;;$username;;;;;yes]]
+$async[bn]
+$addButton[no;rr-i-$authorID;Iniciar;secondary;no;🔫;$var[id]]
+$addButton[no;rr-u;Unirse;secondary;no;💪;$var[id]]
+$endasync
+$await[bn]
+
+$jsonParse[$getUserVar[ruleta-rusa;$authorID;$guildID]]
+$jsonSetString[juego;https://discord.com/channels/$guildID/$channelID/$var[id]]
+$setUserVar[ruleta-rusa;$jsonStringify;$authorID;$guildID]
+
+$async[?]
+$replyIn[300]
+$endasync
+$await[?]
+
+$jsonParse[$getUserVar[ruleta-rusa;$authorID;$guildID]]
+$if[$json[inicio]==]
+$async[op]
+$editButton[rr-i-$authorID;Iniciar;secondary;yes;🔫;$var[id]]
+$editButton[rr-u;Unirse;secondary;yes;💪;$var[id]]
+$endasync
+
+$await[op]
+$var[tico;1]
+$eval[$repeatMessage[10;
+%{DOL}%if[%{DOL}%json[id%{DOL}%var[tico\]\]!=\]
+%{DOL}%resetUserVar[ruleta-rusa\;%{DOL}%json[id%{DOL}%var[tico\]\]\]
+%{DOL}%endif
+%{DOL}%var[tico\;%{DOL}%sum[%{DOL}%var[tico\]\;1\]\]
+]]
+$endif
